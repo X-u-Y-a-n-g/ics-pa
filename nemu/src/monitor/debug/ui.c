@@ -37,6 +37,9 @@ static int cmd_q(char *args) {
 }
 
 static int cmd_help(char *args);
+static int cmd_si(char *args);
+static int cmd_info(char *args);
+static int cmd_x(char *args);
 
 static struct {
   char *name;
@@ -48,6 +51,9 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
+  { "si", "Single step the program", cmd_si },
+  { "info", "Print register state", cmd_info },
+  { "x", "Examine memory: x N EXPR", cmd_x },
 
 };
 
@@ -72,6 +78,88 @@ static int cmd_help(char *args) {
       }
     }
     printf("Unknown command '%s'\n", arg);
+  }
+  return 0;
+}
+
+static int cmd_si(char *args) {
+  // 没有参数，执行1条指令
+  if (args == NULL || *args == '\0') {
+    cpu_exec(1);
+    return 0;
+  }
+  // 解析参数，执行N条指令
+  char *endptr = NULL;
+  unsigned long n = strtoul(args, &endptr, 10);
+  if (endptr == args) { // 没有数字参数
+    printf("Usage: si [N]\n");
+    return 0;
+  }
+  while (*endptr == ' ') { endptr++; }  // 跳过数字后的空格
+  if (*endptr != '\0') {  // 还有多余的参数
+    printf("Usage: si [N]\n");
+    return 0;
+  }
+
+  if (n > 0) {
+    cpu_exec((uint64_t)n);  // 执行N条指令
+  }
+  return 0;
+}
+
+static void print_regs(void) {
+  for (int i = 0; i < 8; i++) {
+    printf("%-3s 0x%08x\n", regsl[i], reg_l(i));
+  }
+  printf("%-3s 0x%08x\n", "eip", cpu.eip);
+}
+
+static int cmd_info(char *args) {
+  if (args == NULL || *args == '\0') {
+    printf("Usage: info r\n");
+    return 0;
+  }
+
+  char *arg = strtok(args, " ");
+  if (arg == NULL) {
+    printf("Usage: info r\n");
+    return 0;
+  }
+
+  if (strcmp(arg, "r") == 0) {
+    print_regs();
+  } else {
+    printf("Unknown info '%s'\n", arg);
+  }
+
+  return 0;
+}
+
+static int cmd_x(char *args) {
+  if (args == NULL || *args == '\0') {
+    printf("Usage: x N EXPR\n");
+    return 0;
+  }
+
+  unsigned int n = 0;
+  char expr[64];
+  int count = sscanf(args, "%u %63s", &n, expr);
+  if (count != 2) {
+    printf("Usage: x N EXPR\n");
+    return 0;
+  }
+  // 解析EXPR为地址
+  char *endptr = NULL;
+  unsigned long addr = strtoul(expr, &endptr, 0);
+  if (endptr == expr || *endptr != '\0') {
+    printf("Bad EXPR: %s\n", expr);
+    return 0;
+  }
+  // 读取内存并打印
+  for (unsigned int i = 0; i < n; i++) {
+    vaddr_t cur = (vaddr_t)(addr + i * 4);
+    uint32_t data = vaddr_read(cur, 4);
+    printf("0x%08x: 0x%08x\n", cur, data);
   }
   return 0;
 }
