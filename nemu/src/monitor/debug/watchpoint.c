@@ -22,7 +22,7 @@ void init_wp_pool() {
 }
 
 /* TODO: Implement the functionality of watchpoint */
-P* new_wp() {
+WP* new_wp() {
   if (free_ == NULL) {
     assert(0);
   }
@@ -57,7 +57,7 @@ WP* add_watchpoint(const char *e) {
     free_wp(wp);
     return NULL;
   }
-  wp->last_val = val;
+  wp->last_value = val;
 
   wp->next = head;
   head = wp;
@@ -104,11 +104,11 @@ bool check_watchpoints() {
       nemu_state = NEMU_STOP;
       return true;
     }
-    if (val != wp->last_val) {
+    if (val != wp->last_value) {
       printf("Watchpoint %d: %s\n", wp->NO, wp->expr);
-      printf("Old value = 0x%08x\n", wp->last_val);
+      printf("Old value = 0x%08x\n", wp->last_value);
       printf("New value = 0x%08x\n", val);
-      wp->last_val = val;
+      wp->last_value = val;
       triggered = true;
     }
   }
