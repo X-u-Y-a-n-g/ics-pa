@@ -40,6 +40,8 @@ static int cmd_help(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
 static int cmd_x(char *args);
+static int cmd_w(char *args);
+static int cmd_d(char *args);
 
 static struct {
   char *name;
@@ -54,6 +56,8 @@ static struct {
   { "si", "Single step the program", cmd_si },
   { "info", "Print register state", cmd_info },
   { "x", "Examine memory: x N EXPR", cmd_x },
+  { "w", "Set a watchpoint: w EXPR", cmd_w },
+  { "d", "Delete a watchpoint: d N", cmd_d },
 
 };
 
@@ -128,6 +132,8 @@ static int cmd_info(char *args) {
 
   if (strcmp(arg, "r") == 0) {
     print_regs();
+  } else if (strcmp(arg, "w") == 0) {
+    list_watchpoints();
   } else {
     printf("Unknown info '%s'\n", arg);
   }
@@ -160,6 +166,47 @@ static int cmd_x(char *args) {
     vaddr_t cur = (vaddr_t)(addr + i * 4);
     uint32_t data = vaddr_read(cur, 4);
     printf("0x%08x: 0x%08x\n", cur, data);
+  }
+  return 0;
+}
+
+static int cmd_w(char *args) {
+  if (args == NULL || *args == '\0') {
+    printf("Usage: w EXPR\n");
+    return 0;
+  }
+  while (*args == ' ') { args++; }
+  if (*args == '\0') {
+    printf("Usage: w EXPR\n");
+    return 0;
+  }
+
+  WP *wp = add_watchpoint(args);
+  if (wp != NULL) {
+    printf("Watchpoint %d: %s\n", wp->NO, wp->expr);
+  }
+  return 0;
+}
+
+static int cmd_d(char *args) {
+  if (args == NULL || *args == '\0') {
+    printf("Usage: d N\n");
+    return 0;
+  }
+  char *endptr = NULL;
+  long no = strtol(args, &endptr, 10);
+  if (endptr == args) {
+    printf("Usage: d N\n");
+    return 0;
+  }
+  while (*endptr == ' ') { endptr++; }
+  if (*endptr != '\0') {
+    printf("Usage: d N\n");
+    return 0;
+  }
+
+  if (!delete_watchpoint((int)no)) {
+    printf("No watchpoint number %ld\n", no);
   }
   return 0;
 }
