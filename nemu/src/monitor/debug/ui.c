@@ -60,7 +60,6 @@ static struct {
   { "x", "Examine memory: x N EXPR", cmd_x },
   { "w", "Set a watchpoint: w EXPR", cmd_w },
   { "d", "Delete a watchpoint: d N", cmd_d },
-
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
@@ -170,18 +169,22 @@ static int cmd_x(char *args) {
     return 0;
   }
 
-  unsigned int n = 0;
-  char expr[64];
-  int count = sscanf(args, "%u %63s", &n, expr);
-  if (count != 2) {
+  char *endptr = NULL;
+  unsigned long n = strtoul(args, &endptr, 10);
+  if (endptr == args) {
     printf("Usage: x N EXPR\n");
     return 0;
   }
-  // 解析EXPR为地址
-  char *endptr = NULL;
-  unsigned long addr = strtoul(expr, &endptr, 0);
-  if (endptr == expr || *endptr != '\0') {
-    printf("Bad EXPR: %s\n", expr);
+  while (*endptr == ' ') { endptr++; }
+  if (*endptr == '\0') {
+    printf("Usage: x N EXPR\n");
+    return 0;
+  }
+
+  bool success = true;
+  uint32_t addr = expr(endptr, &success);
+  if (!success) {
+    printf("Bad expression: %s\n", endptr);
     return 0;
   }
   // 读取内存并打印
