@@ -39,6 +39,7 @@ static int cmd_q(char *args) {
 static int cmd_help(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
+static int cmd_p(char *args);
 static int cmd_x(char *args);
 static int cmd_w(char *args);
 static int cmd_d(char *args);
@@ -55,6 +56,7 @@ static struct {
   /* TODO: Add more commands */
   { "si", "Single step the program", cmd_si },
   { "info", "Print register state", cmd_info },
+  { "p", "Print expression value: p EXPR", cmd_p },
   { "x", "Examine memory: x N EXPR", cmd_x },
   { "w", "Set a watchpoint: w EXPR", cmd_w },
   { "d", "Delete a watchpoint: d N", cmd_d },
@@ -120,13 +122,13 @@ static void print_regs(void) {
 
 static int cmd_info(char *args) {
   if (args == NULL || *args == '\0') {
-    printf("Usage: info r\n");
+    printf("Usage: info r|w\n");
     return 0;
   }
 
   char *arg = strtok(args, " ");
   if (arg == NULL) {
-    printf("Usage: info r\n");
+    printf("Usage: info r|w\n");
     return 0;
   }
 
@@ -138,6 +140,27 @@ static int cmd_info(char *args) {
     printf("Unknown info '%s'\n", arg);
   }
 
+  return 0;
+}
+
+static int cmd_p(char *args) {
+  if (args == NULL || *args == '\0') {
+    printf("Usage: p EXPR\n");
+    return 0;
+  }
+  while (*args == ' ') { args++; }
+  if (*args == '\0') {
+    printf("Usage: p EXPR\n");
+    return 0;
+  }
+
+  bool success = true;
+  uint32_t val = expr(args, &success);
+  if (!success) {
+    printf("Bad expression: %s\n", args);
+    return 0;
+  }
+  printf("0x%08x (%u)\n", val, val);
   return 0;
 }
 
