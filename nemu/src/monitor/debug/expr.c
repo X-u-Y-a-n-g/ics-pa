@@ -26,7 +26,7 @@ static struct rule {
    */
 
   {" +", TK_NOTYPE},    // spaces
-  {"\\$[a-zA-Z]{2,3}", TK_REG},   // register
+  {"\\$[a-zA-Z][a-zA-Z0-9]*", TK_REG},   // register
   {"0[xX][0-9a-fA-F]+", TK_NUM},  // hex number
   {"[0-9]+", TK_NUM},             // decimal number
   {"\\|\\|", TK_OR},              // logical or
