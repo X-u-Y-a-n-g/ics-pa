@@ -81,6 +81,7 @@ static inline void load_img() {
 
 static inline void restart() {
   /* Set the initial instruction pointer. */
+  memset(&cpu, 0, sizeof(cpu));
   cpu.eip = ENTRY_START;
 
 #ifdef DIFF_TEST
