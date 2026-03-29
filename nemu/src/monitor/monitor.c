@@ -83,7 +83,8 @@ static inline void restart() {
   /* Set the initial instruction pointer. */
   memset(&cpu, 0, sizeof(cpu));
   cpu.eip = ENTRY_START;
-
+  cpu.eflags = 0x2;
+  
 #ifdef DIFF_TEST
   init_qemu_reg();
 #endif

@@ -34,6 +34,25 @@ typedef struct {
   
   vaddr_t eip;
 
+  union {
+    struct {
+      uint32_t CF    :1;
+      uint32_t _1    :1;
+      uint32_t _2    :1;
+      uint32_t _3    :1;
+      uint32_t _4    :1;
+      uint32_t _5    :1;
+      uint32_t ZF    :1;
+      uint32_t SF    :1;
+      uint32_t _8    :1;
+      uint32_t IF    :1;
+      uint32_t _10   :1;
+      uint32_t OF    :1;
+      uint32_t _rest :20;
+    };
+    uint32_t eflags;
+  };
+
 } CPU_state;
 
 extern CPU_state cpu;
