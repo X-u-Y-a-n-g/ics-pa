@@ -9,12 +9,15 @@ make_EHelper(add);
 make_EHelper(adc);
 make_EHelper(and);
 make_EHelper(or);
+make_EHelper(cmp);
+make_EHelper(test);
 
 make_EHelper(push);
 make_EHelper(pop);
 
 make_EHelper(call);
 make_EHelper(ret);
+make_EHelper(jcc);
 
 make_EHelper(operand_size);
 make_EHelper(nop);
