@@ -34,6 +34,7 @@ make_EHelper(operand_size);
 make_EHelper(nop);
 make_EHelper(setcc);
 make_EHelper(movzx);
+make_EHelper(movsx);
 
 make_EHelper(inv);
 make_EHelper(nemu_trap);
