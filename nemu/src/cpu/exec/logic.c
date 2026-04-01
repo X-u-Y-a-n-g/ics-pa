@@ -2,6 +2,16 @@
 
 make_EHelper(test) {
   // TODO();
+  if (decoding.opcode == 0xf6 || decoding.opcode == 0xf7) {
+    id_src->type = OP_TYPE_IMM;
+    id_src->width = id_dest->width;
+    id_src->imm = instr_fetch(eip, id_src->width);
+    rtl_li(&id_src->val, id_src->imm);
+#ifdef DEBUG
+    snprintf(id_src->str, OP_STR_SIZE, "$0x%x", id_src->imm);
+#endif
+  }
+  
   rtl_and(&t2, &id_dest->val, &id_src->val);
 
   rtl_update_ZFSF(&t2, id_dest->width);
