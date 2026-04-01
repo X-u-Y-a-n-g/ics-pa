@@ -1,10 +1,13 @@
 #include "cpu/exec.h"
 
 make_EHelper(mov);
-
+make_EHelper(lea);
 
 make_EHelper(sub);
 make_EHelper(xor);
+make_EHelper(add);
+make_EHelper(adc);
+make_EHelper(and);
 
 make_EHelper(push);
 make_EHelper(pop);
