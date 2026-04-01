@@ -26,6 +26,9 @@ make_EHelper(ret);
 make_EHelper(jcc);
 make_EHelper(jmp);
 make_EHelper(imul2);
+make_EHelper(cltd);
+make_EHelper(div);
+make_EHelper(idiv);
 
 make_EHelper(operand_size);
 make_EHelper(nop);
