@@ -25,6 +25,7 @@ make_EHelper(call);
 make_EHelper(ret);
 make_EHelper(jcc);
 make_EHelper(jmp);
+make_EHelper(imul2);
 
 make_EHelper(operand_size);
 make_EHelper(nop);
