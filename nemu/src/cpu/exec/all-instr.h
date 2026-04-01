@@ -8,6 +8,7 @@ make_EHelper(sub);
 make_EHelper(xor);
 make_EHelper(add);
 make_EHelper(adc);
+make_EHelper(sbb);
 make_EHelper(and);
 make_EHelper(or);
 make_EHelper(cmp);
