@@ -12,6 +12,7 @@ make_EHelper(or);
 make_EHelper(cmp);
 make_EHelper(test);
 make_EHelper(inc);
+make_EHelper(dec);
 make_EHelper(shl);
 make_EHelper(shr);
 make_EHelper(sar);
