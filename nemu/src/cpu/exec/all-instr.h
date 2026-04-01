@@ -34,6 +34,8 @@ make_EHelper(imul1);
 make_EHelper(cltd);
 make_EHelper(div);
 make_EHelper(idiv);
+make_EHelper(in);
+make_EHelper(out);
 
 make_EHelper(operand_size);
 make_EHelper(nop);
