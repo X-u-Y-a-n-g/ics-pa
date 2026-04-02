@@ -36,9 +36,12 @@ void _draw_rect(const uint32_t *pixels, int x, int y, int w, int h) {
 
   int row;
   for (row = 0; row < h; row++) {
-    memcpy(fb + (y + row) * _screen.width + x,
-           pixels + row * w,
-           w * sizeof(uint32_t));
+    uint32_t *dst = fb + (y + row) * _screen.width + x;
+    const uint32_t *src = pixels + row * w;
+    int col;
+    for (col = 0; col < w; col++) {
+      dst[col] = src[col] | 0xff000000u;
+    }
   }
 }
 
