@@ -15,6 +15,7 @@ _RegSet* do_syscall(_RegSet *r) {
       int fd = (int)a[1];
       const char *buf = (const char *)a[2];
       size_t len = (size_t)a[3];
+      Log("SYS_write fd=%d len=%d", fd, (int)len);
       if (fd == 1 || fd == 2) {
         for (size_t i = 0; i < len; i++) {
           _putc(buf[i]);
