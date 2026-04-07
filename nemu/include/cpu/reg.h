@@ -33,6 +33,12 @@ typedef struct {
   };
   
   vaddr_t eip;
+  uint16_t cs;
+
+  struct {
+    uint16_t limit;
+    uint32_t base;
+  } idtr;
 
   union {
     struct {
