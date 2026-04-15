@@ -4,6 +4,7 @@ void ramdisk_read(void *buf, off_t offset, size_t len);
 void ramdisk_write(const void *buf, off_t offset, size_t len);
 size_t events_read(void *buf, size_t len);
 void dispinfo_read(void *buf, off_t offset, size_t len);
+size_t dispinfo_size(void);
 void fb_write(const void *buf, off_t offset, size_t len);
 
 typedef struct {
@@ -22,7 +23,7 @@ static Finfo file_table[] __attribute__((used)) = {
   {"stderr (note that this is not the actual stderr)", 0, 0},
   [FD_FB] = {"/dev/fb", 0, 0},
   [FD_EVENTS] = {"/dev/events", 0, 0},
-  [FD_DISPINFO] = {"/proc/dispinfo", 128, 0},
+  [FD_DISPINFO] = {"/proc/dispinfo", 0, 0},
 #include "files.h"
 };
 
@@ -31,6 +32,7 @@ static Finfo file_table[] __attribute__((used)) = {
 void init_fs() {
   // TODO: initialize the size of /dev/fb
   file_table[FD_FB].size = _screen.width * _screen.height * sizeof(uint32_t);
+  file_table[FD_DISPINFO].size = dispinfo_size();
 }
 
 int fs_open(const char *pathname, int flags, int mode) {
@@ -94,9 +96,14 @@ ssize_t fs_write(int fd, const void *buf, size_t len) {
     return 0;
   }
   if (fd == FD_FB) {
-    fb_write(buf, f->open_offset, len);
-    f->open_offset += len;
-    return len;
+    if (f->open_offset >= (off_t)f->size) return 0;
+    size_t n = len;
+    if (f->open_offset + (off_t)n > (off_t)f->size) {
+      n = f->size - f->open_offset;
+    }
+    fb_write(buf, f->open_offset, n);
+    f->open_offset += n;
+    return n;
   }
   if (f->open_offset >= (off_t)f->size) return 0;
   size_t n = len;
