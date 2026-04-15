@@ -11,7 +11,7 @@ uintptr_t loader(_Protect *as, const char *filename) {
   // size_t size = get_ramdisk_size();
   // ramdisk_read(DEFAULT_ENTRY, 0, size);
   // return (uintptr_t)DEFAULT_ENTRY;
-  const char *fname = filename ? filename : "/bin/hello";
+  const char *fname = filename ? filename : "/bin/init";
   int fd = fs_open(fname, 0, 0);
   size_t size = fs_filesz(fd);
   fs_read(fd, DEFAULT_ENTRY, size);
