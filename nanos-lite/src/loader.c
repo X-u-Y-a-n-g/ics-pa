@@ -1,4 +1,5 @@
 #include "common.h"
+#include "fs.h"
 
 #define DEFAULT_ENTRY ((void *)0x4000000)
 
@@ -7,7 +8,13 @@ size_t get_ramdisk_size();
 
 uintptr_t loader(_Protect *as, const char *filename) {
   // TODO();
-  size_t size = get_ramdisk_size();
-  ramdisk_read(DEFAULT_ENTRY, 0, size);
+  // size_t size = get_ramdisk_size();
+  // ramdisk_read(DEFAULT_ENTRY, 0, size);
+  // return (uintptr_t)DEFAULT_ENTRY;
+  const char *fname = filename ? filename : "/bin/hello";
+  int fd = fs_open(fname, 0, 0);
+  size_t size = fs_filesz(fd);
+  fs_read(fd, DEFAULT_ENTRY, size);
+  fs_close(fd);
   return (uintptr_t)DEFAULT_ENTRY;
 }
