@@ -12,7 +12,7 @@ uintptr_t loader(_Protect *as, const char *filename) {
   // ramdisk_read(DEFAULT_ENTRY, 0, size);
   // return (uintptr_t)DEFAULT_ENTRY;
   (void)as;
-  const char *fname = (filename == NULL ? "/bin/events" : filename);
+  const char *fname = (filename == NULL ? "/bin/pal" : filename);
   int fd = fs_open(fname, 0, 0);
   size_t size = fs_filesz(fd);
   fs_read(fd, DEFAULT_ENTRY, size);
