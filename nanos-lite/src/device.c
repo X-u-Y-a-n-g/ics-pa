@@ -9,10 +9,10 @@ static const char *keyname[256] __attribute__((used)) = {
 };
 
 size_t events_read(void *buf, size_t len) {
-  static uint32_t last_time = 0;
   static char evbuf[64];
   static size_t evlen = 0;
   static size_t evoff = 0;
+
   if (len == 0) return 0;
 
   // If there is no pending event text, try to generate one first.
@@ -28,18 +28,15 @@ size_t events_read(void *buf, size_t len) {
       snprintf(evbuf, sizeof(evbuf), "%s %s\n", down ? "kd" : "ku", name);
       evlen = strlen(evbuf);
     } else {
+      // Always provide a timer event when there is no key event.
+      // Returning 0 here may make stdio mark EOF permanently for getc/fgetc.
       uint32_t now = _uptime();
-      if (now - last_time >= 1000 / 30) {
-        last_time = now;
-        snprintf(evbuf, sizeof(evbuf), "t %u\n", now);
-        evlen = strlen(evbuf);
-      }
+      snprintf(evbuf, sizeof(evbuf), "t %u\n", now);
+      evlen = strlen(evbuf);
     }
   }
 
-  if (evoff == evlen) {
-    return 0;
-  }
+  assert(evoff < evlen);
 
   size_t n = len;
   size_t remain = evlen - evoff;
