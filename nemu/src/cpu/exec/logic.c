@@ -95,6 +95,52 @@ make_EHelper(shr) {
   print_asm_template2(shr);
 }
 
+make_EHelper(rol) {
+  uint32_t bits = id_dest->width * 8;
+  uint32_t mask = (bits == 32 ? 0xffffffffu : ((1u << bits) - 1));
+  uint32_t count = (id_src->val & 0x1f) % bits;
+
+  if (count != 0) {
+    uint32_t val = id_dest->val & mask;
+    uint32_t res = ((val << count) | (val >> (bits - count))) & mask;
+    rtl_li(&t2, res);
+    operand_write(id_dest, &t2);
+
+    rtl_li(&t0, res & 0x1u);
+    rtl_set_CF(&t0);
+    if (count == 1) {
+      uint32_t of = ((res >> (bits - 1)) & 1u) ^ (res & 1u);
+      rtl_li(&t0, of);
+      rtl_set_OF(&t0);
+    }
+  }
+
+  print_asm_template2(rol);
+}
+
+make_EHelper(ror) {
+  uint32_t bits = id_dest->width * 8;
+  uint32_t mask = (bits == 32 ? 0xffffffffu : ((1u << bits) - 1));
+  uint32_t count = (id_src->val & 0x1f) % bits;
+
+  if (count != 0) {
+    uint32_t val = id_dest->val & mask;
+    uint32_t res = ((val >> count) | (val << (bits - count))) & mask;
+    rtl_li(&t2, res);
+    operand_write(id_dest, &t2);
+
+    rtl_li(&t0, (res >> (bits - 1)) & 1u);
+    rtl_set_CF(&t0);
+    if (count == 1) {
+      uint32_t of = ((res >> (bits - 1)) & 1u) ^ ((res >> (bits - 2)) & 1u);
+      rtl_li(&t0, of);
+      rtl_set_OF(&t0);
+    }
+  }
+
+  print_asm_template2(ror);
+}
+
 make_EHelper(setcc) {
   uint8_t subcode = decoding.opcode & 0xf;
   rtl_setcc(&t2, subcode);
