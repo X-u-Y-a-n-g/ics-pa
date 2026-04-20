@@ -10,24 +10,47 @@ static const char *keyname[256] __attribute__((used)) = {
 
 size_t events_read(void *buf, size_t len) {
   static uint32_t last_time = 0;
+  static char evbuf[64];
+  static size_t evlen = 0;
+  static size_t evoff = 0;
   if (len == 0) return 0;
 
-  int key = _read_key();
-  if (key != _KEY_NONE) {
-    bool down = (key & 0x8000) != 0;
-    key &= 0x7fff;
-    const char *name = (key >= 0 && key < 256 && keyname[key] != NULL) ? keyname[key] : "NONE";
-    snprintf((char *)buf, len, "%s %s\n", down ? "kd" : "ku", name);
-    return strlen((char *)buf);
+  // If there is no pending event text, try to generate one first.
+  if (evoff == evlen) {
+    evlen = 0;
+    evoff = 0;
+
+    int key = _read_key();
+    if (key != _KEY_NONE) {
+      bool down = (key & 0x8000) != 0;
+      key &= 0x7fff;
+      const char *name = (key >= 0 && key < 256 && keyname[key] != NULL) ? keyname[key] : "NONE";
+      snprintf(evbuf, sizeof(evbuf), "%s %s\n", down ? "kd" : "ku", name);
+      evlen = strlen(evbuf);
+    } else {
+      uint32_t now = _uptime();
+      if (now - last_time >= 1000 / 30) {
+        last_time = now;
+        snprintf(evbuf, sizeof(evbuf), "t %u\n", now);
+        evlen = strlen(evbuf);
+      }
+    }
   }
 
-  uint32_t now = _uptime();
-  if (now - last_time >= 1000 / 30) {
-    last_time = now;
-    snprintf((char *)buf, len, "t %u\n", now);
-    return strlen((char *)buf);
+  if (evoff == evlen) {
+    return 0;
   }
-  return 0;
+
+  size_t n = len;
+  size_t remain = evlen - evoff;
+  if (n > remain) n = remain;
+  memcpy(buf, evbuf + evoff, n);
+  evoff += n;
+  if (evoff == evlen) {
+    evoff = 0;
+    evlen = 0;
+  }
+  return n;
 }
 
 static char dispinfo[128] __attribute__((used));
