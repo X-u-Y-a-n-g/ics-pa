@@ -111,5 +111,7 @@ make_DHelper(in_I2a);
 make_DHelper(in_dx2a);
 make_DHelper(out_a2I);
 make_DHelper(out_a2dx);
+make_DHelper(mov_C2E);
+make_DHelper(mov_E2C);
 
 #endif
