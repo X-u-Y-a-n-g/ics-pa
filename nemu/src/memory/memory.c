@@ -65,24 +65,20 @@ void paddr_write(paddr_t addr, int len, uint32_t data) {
 
 uint32_t vaddr_read(vaddr_t addr, int len) {
   // return paddr_read(addr, len);
-  assert(len == 1 || len == 2 || len == 4);
-  int first_len = PAGE_SIZE - (addr & PAGE_MASK);
-  if (first_len < len) {
-    uint32_t low = vaddr_read(addr, first_len);
-    uint32_t high = vaddr_read(addr + first_len, len - first_len);
-    return low | (high << (first_len * 8));
+  assert(len >= 1 && len <= 4);
+  uint32_t data = 0;
+  for (int i = 0; i < len; i ++) {
+    paddr_t paddr = page_translate(addr + i, false);
+    data |= paddr_read(paddr, 1) << (i * 8);
   }
-  return paddr_read(page_translate(addr, false), len);
+  return data;
 }
 
 void vaddr_write(vaddr_t addr, int len, uint32_t data) {
   // paddr_write(addr, len, data);
-  assert(len == 1 || len == 2 || len == 4);
-  int first_len = PAGE_SIZE - (addr & PAGE_MASK);
-  if (first_len < len) {
-    vaddr_write(addr, first_len, data);
-    vaddr_write(addr + first_len, len - first_len, data >> (first_len * 8));
-    return;
+  assert(len >= 1 && len <= 4);
+  for (int i = 0; i < len; i ++) {
+    paddr_t paddr = page_translate(addr + i, true);
+    paddr_write(paddr, 1, data >> (i * 8));
   }
-  paddr_write(page_translate(addr, true), len, data);
 }
