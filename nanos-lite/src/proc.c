@@ -18,9 +18,9 @@ void load_prog(const char *filename) {
   pcb[i].max_brk = loader_brk;
 
   // TODO: remove the following three lines after you have implemented _umake()
-  _switch(&pcb[i].as);
-  current = &pcb[i];
-  ((void (*)(void))entry)();
+  // _switch(&pcb[i].as);
+  // current = &pcb[i];
+  // ((void (*)(void))entry)();
 
   _Area stack;
   stack.start = pcb[i].stack;
@@ -30,5 +30,12 @@ void load_prog(const char *filename) {
 }
 
 _RegSet* schedule(_RegSet *prev) {
-  return NULL;
+  // return NULL;
+  if (current != NULL) {
+    current->tf = prev;
+  }
+
+  current = &pcb[0];
+  _switch(&current->as);
+  return current->tf;
 }
