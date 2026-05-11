@@ -1,9 +1,11 @@
 #include "proc.h"
 
 #define MAX_NR_PROC 4
+#define PAL_QUOTA 8 // time slice for each process
 
 static PCB pcb[MAX_NR_PROC];
 static int nr_proc = 0;
+static int pal_ticks = 0; // time ticks for the current process
 PCB *current = NULL;
 
 uintptr_t loader(_Protect *as, const char *filename);
@@ -41,7 +43,15 @@ _RegSet* schedule(_RegSet *prev) {
     current = &pcb[0];
   }
   else {
-    current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+    // current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+    if (current == &pcb[0] && pal_ticks < PAL_QUOTA) {
+      pal_ticks ++;
+      current = &pcb[0];
+    }
+    else {
+      pal_ticks = 0;
+      current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+    }// current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
   }
 
   _switch(&current->as);
