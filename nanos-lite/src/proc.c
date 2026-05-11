@@ -10,6 +10,7 @@ uintptr_t loader(_Protect *as, const char *filename);
 extern uintptr_t loader_brk;
 
 void load_prog(const char *filename) {
+  assert(nr_proc < MAX_NR_PROC);
   int i = nr_proc ++;
   _protect(&pcb[i].as);
 
@@ -35,7 +36,14 @@ _RegSet* schedule(_RegSet *prev) {
     current->tf = prev;
   }
 
-  current = &pcb[0];
+  // current = &pcb[0];
+  if (nr_proc == 1) {
+    current = &pcb[0];
+  }
+  else {
+    current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  }
+
   _switch(&current->as);
   return current->tf;
 }
