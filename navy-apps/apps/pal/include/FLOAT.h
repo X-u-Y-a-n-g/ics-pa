@@ -18,13 +18,13 @@ static inline int F2int(FLOAT a) {
 static inline FLOAT int2F(int a) {
   // assert(0);
   // return 0;
-  return (FLOAT)((int64_t)a * FLOAT_SCALE);
+  return (FLOAT)(a * FLOAT_SCALE);
 }
 
 static inline FLOAT F_mul_int(FLOAT a, int b) {
   // assert(0);
   // return 0;
-  return (FLOAT)((int64_t)a * b);
+  return a * b;
 }
 
 static inline FLOAT F_div_int(FLOAT a, int b) {

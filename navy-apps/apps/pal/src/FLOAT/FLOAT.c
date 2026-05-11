@@ -2,17 +2,38 @@
 #include <stdint.h>
 #include <assert.h>
 
+static uint32_t F_abs_u32(FLOAT a) {
+  return a < 0 ? (uint32_t)(-(a + 1)) + 1 : (uint32_t)a;
+}
+
 FLOAT F_mul_F(FLOAT a, FLOAT b) {
   // assert(0);
   // return 0;
-  return (FLOAT)(((int64_t)a * b) / FLOAT_SCALE);
+  uint32_t ua = F_abs_u32(a);
+  uint32_t ub = F_abs_u32(b);
+  uint32_t val = (uint32_t)(((uint64_t)ua * ub) >> FLOAT_FRAC_BITS);
+  return ((a < 0) ^ (b < 0)) ? -(FLOAT)val : (FLOAT)val;
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
   // assert(0);
   // return 0;
   assert(b != 0);
-  return (FLOAT)(((int64_t)a * FLOAT_SCALE) / b);
+  
+  uint32_t ua = F_abs_u32(a);
+  uint32_t ub = F_abs_u32(b);
+  uint32_t val = (ua / ub) << FLOAT_FRAC_BITS;
+  uint32_t rem = ua % ub;
+
+  for (int i = FLOAT_FRAC_BITS - 1; i >= 0; i--) {
+    rem <<= 1;
+    if (rem >= ub) {
+      rem -= ub;
+      val |= 1u << i;
+    }
+  }
+
+  return ((a < 0) ^ (b < 0)) ? -(FLOAT)val : (FLOAT)val;
 }
 
 FLOAT f2F(float a) {
