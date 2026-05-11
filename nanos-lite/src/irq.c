@@ -7,8 +7,16 @@ _RegSet* schedule(_RegSet *prev);
 static _RegSet* do_event(_Event e, _RegSet* r) {
   switch (e.event) {
     case _EVENT_SYSCALL:
-      do_syscall(r);
+      // do_syscall(r);
+      // return schedule(r);
+      return do_syscall(r);
+    case _EVENT_IRQ_TIME:{
+      static int timer_count = 0;
+      if (++ timer_count % 100 == 0) {
+        Log("Timer interrupt");
+      }
       return schedule(r);
+    }
     case _EVENT_TRAP:
       Log("Kernel trap");
       return schedule(r);

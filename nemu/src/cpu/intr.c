@@ -9,6 +9,7 @@ void raise_intr(uint8_t NO, vaddr_t ret_addr) {
   // TODO();
   rtlreg_t esp = reg_l(R_ESP);
   esp -= 4; vaddr_write(esp, 4, cpu.eflags);
+  cpu.IF = 0;
   esp -= 4; vaddr_write(esp, 4, cpu.cs);
   esp -= 4; vaddr_write(esp, 4, ret_addr);
   reg_l(R_ESP) = esp;
@@ -21,4 +22,5 @@ void raise_intr(uint8_t NO, vaddr_t ret_addr) {
 }
 
 void dev_raise_intr() {
+  cpu.INTR = true;
 }

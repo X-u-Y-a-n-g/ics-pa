@@ -35,6 +35,7 @@ typedef struct {
   
   vaddr_t eip;
   uint16_t cs;
+  bool INTR;
 
   CR0 cr0;
   CR3 cr3;
