@@ -22,6 +22,8 @@ make_EHelper(shr);
 make_EHelper(sar);
 make_EHelper(rol);
 make_EHelper(ror);
+make_EHelper(shld);
+make_EHelper(shrd);
 
 make_EHelper(push);
 make_EHelper(pop);

@@ -95,6 +95,42 @@ make_EHelper(shr) {
   print_asm_template2(shr);
 }
 
+make_EHelper(shld) {
+  uint32_t bits = id_dest->width * 8;
+  uint32_t mask = (bits == 32 ? 0xffffffffu : ((1u << bits) - 1));
+  uint32_t count = id_src->val & 0x1f;
+
+  if (count != 0) {
+    assert(count <= bits);
+    uint32_t dest = id_dest->val & mask;
+    uint32_t src = id_src2->val & mask;
+    uint32_t res = ((dest << count) | (src >> (bits - count))) & mask;
+    rtl_li(&t2, res);
+    operand_write(id_dest, &t2);
+    rtl_update_ZFSF(&t2, id_dest->width);
+  }
+
+  print_asm_template3(shld);
+}
+
+make_EHelper(shrd) {
+  uint32_t bits = id_dest->width * 8;
+  uint32_t mask = (bits == 32 ? 0xffffffffu : ((1u << bits) - 1));
+  uint32_t count = id_src->val & 0x1f;
+
+  if (count != 0) {
+    assert(count <= bits);
+    uint32_t dest = id_dest->val & mask;
+    uint32_t src = id_src2->val & mask;
+    uint32_t res = ((dest >> count) | (src << (bits - count))) & mask;
+    rtl_li(&t2, res);
+    operand_write(id_dest, &t2);
+    rtl_update_ZFSF(&t2, id_dest->width);
+  }
+
+  print_asm_template3(shrd);
+}
+
 make_EHelper(rol) {
   uint32_t bits = id_dest->width * 8;
   uint32_t mask = (bits == 32 ? 0xffffffffu : ((1u << bits) - 1));
